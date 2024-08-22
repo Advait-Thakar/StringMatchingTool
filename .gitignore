@@ -1,0 +1,13 @@
+# Ignore the build directory
+/build/
+
+# Ignore any .log files
+*.log
+
+# Ignore IDE files
+.idea/
+*.iml
+.vscode/
+
+# Ignore node_modules for JavaScript/Node.js projects
+node_modules/
