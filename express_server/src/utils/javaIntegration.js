@@ -8,7 +8,7 @@ const runJavaClass = (args) => {
 
     // Construct the command to run the Java class
     const jarPath = 'D://Project/StringMatchingTool/express_server/src/utils/encoder.jar';
-    const command = `java -jar ${jarPath} "${args.args0}" "${args.args1}" "${args.args3}"`;
+    const command = `java -jar ${jarPath} "${args.args0}" "${args.args1}" "${args.args2}"`;
 
     return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
