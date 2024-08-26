@@ -15,7 +15,7 @@ router.get('/test', (req, res) => {
 // Handle file upload with multer
 router.post('/upload', upload.single('pdf'), uploadController.handleUpload);
 
-// Example route for searching (modify as needed)
+// Route for searching
 router.get('/search', /* include database fetching logics here*/);
 
 module.exports = router;

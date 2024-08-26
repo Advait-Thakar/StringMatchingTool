@@ -1,16 +1,21 @@
-const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const parser = require('pdf-parse');
 const ERROR = require('../constants/errors');
 const SUCCESS = require('../constants/responses');
+const uploadPdfData = require("../repository/uploadData");
 const { runJavaClass, runTest } = require("../utils/javaIntegration");
 const { textTransform } = require('../utils/textTransform');
+const { getChunkedData } = require('../utils/chunking');
+const { getExtractedText } = require('../utils/extractPdf');
 
-const uploadService = async (req, res) => {
+const uploadService = async (req) => {
     if (!req.file || req.file.mimetype !== "application/pdf") {
         const error = ERROR.getErrorMessage("BAD_REQUEST");
-        return res.status(error.status).json({ message: error.message + ". Please upload a valid PDF file." });
+        const errorData = {
+            status: error.status,
+            message: error.message + ". Please upload a valid PDF file."
+        }
+        return errorData;
     }
 
     try {
@@ -18,44 +23,37 @@ const uploadService = async (req, res) => {
 
         const fileBuffer = fs.readFileSync(filePath);
 
-        const data = await parser(fileBuffer);
+        const pdfInfo = (await getExtractedText(fileBuffer)).metadata;
+        const data = (await getExtractedText(fileBuffer)).pages;
+
+        const pages = getChunkedData(data);
 
         //fs.unlinkSync(filePath);
 
-        const cleanedText = textTransform(data.text);
-
-        // Create a string containing all ASCII values from 1 to 255 (excluding null byte 0)
-        //let asciiFeeder = "1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z";
-
-        // Print the resulting string
-        //console.log(asciiFeeder);
-
-
-        const feeder = cleanedText;
-        const mode = "encode";
-        const text = cleanedText;
-
-        const jsonArgs = {
-            args0: cleanedText,
-            args1: mode,
-            args2: cleanedText,
-        }
-
-        const encoded = await runJavaClass(jsonArgs);
+        //const encoded = await runJavaClass(send_your_arguments_here_as_json);
 
         const response = SUCCESS.getSuccessMessage("CREATED");
-
-        res.status(response.status).json({
+    
+        const responseData = {
             status: response.status,
             message: response.message,
-            content: cleanedText,
-            encoded: encoded
-        });
+            pdfInfo: pdfInfo,
+            content: pages,
+        };
+
+        await uploadPdfData(JSON.stringify({pdfInfo, pages}));
+
+        return responseData;
 
     } catch (err) {
-        console.error('Upload service error:', err); // Log detailed error information
+        console.error('Upload service error:', err); 
         const error = ERROR.getErrorMessage("INTERNAL_SERVER_ERROR");
-        return res.status(error.status).json({ message: error.message + ". Cannot process PDF file." });
+        const errorData = {
+            status: error.status,
+            message: error.message + ". Cannot process PDF file."
+        };
+
+        return errorData;
     }
 }
 

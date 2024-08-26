@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Pdf {
+  pdfId           String    @id @default(auto()) @map("_id") @db.ObjectId
+  number_of_pages Int
+  version         String
+  content         Content[]
+}
+
+model Content {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  pdfId  String  @db.ObjectId
+  Pdf    Pdf     @relation(fields: [pdfId], references: [pdfId], onDelete: Cascade)
+  chunks Chunk[]
+}
+
+model Chunk {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  contentId String    @db.ObjectId
+  Content   Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  sublines  Subline[]
+}
+
+model Subline {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  pagenum    Int
+  linenum    Int
+  sublinenum Int
+  chunkId    String @db.ObjectId
+  Chunk      Chunk  @relation(fields: [chunkId], references: [id], onDelete: Cascade)
+  text       String
+}
