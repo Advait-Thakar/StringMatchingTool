@@ -2,7 +2,6 @@ const { exec } = require('child_process');
 const path = require('path');
 
 // Correct path to your compiled Java classes directory
-const Java_Path = "D://Project/StringMatchingTool/express_server/src/utils";
 
 const runJavaClass = (args) => {
 
@@ -27,6 +26,27 @@ const runJavaClass = (args) => {
     });
 };
 
+const useBoyerMooreClass = (args) => {
+    const jarPath = 'D://Project/StringMatchingTool/express_server/src/utils/searching.jar';
+    const command = `java -jar ${jarPath} "${args.args0}" "${args.args1}"`;
+
+    return new Promise((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error executing Java class: ${error.message}`); // Log the error
+                reject(`Error executing Java class: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.error(`Java Class Error: ${stderr}`); // Log stderr
+                reject(`Java Class Error: ${stderr}`);
+                return;
+            }
+            resolve(stdout.trim());
+        });
+    });
+}
+
 const runTest = (args) => {
     const jarPath = 'D://Project/StringMatchingTool/express_server/src/utils/techmintapp.jar';
     const argString = args.join(" ");
@@ -43,4 +63,4 @@ const runTest = (args) => {
     });
 };
 
-module.exports = { runJavaClass, runTest };
+module.exports = { runJavaClass, useBoyerMooreClass, runTest };

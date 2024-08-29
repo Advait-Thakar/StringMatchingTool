@@ -13,7 +13,10 @@ public class searching {
         }
     }
 
-    public static void search(char[] txt, char[] pat) {
+    public static String search(char[] txt, char[] pat) {
+        boolean flag = false;
+        int freq = 0;
+        ArrayList<Integer> offsets = new ArrayList<Integer>();
         int m = pat.length;
         int n = txt.length;
 
@@ -31,12 +34,17 @@ public class searching {
             }
 
             if (j < 0) {
-                System.out.println("Pattern found at index: " + s);
+                flag = true;
+                freq++;
+                offsets.add(s);
+                // System.out.println("Pattern found at index: " + s);
                 s += (s + m < n) ? m - badChars[txt[s + m]] : 1;
             } else {
                 s += Math.max(1, j - badChars[txt[s + j]]);
             }
         }
+        String response = flag + ":" + freq + ":" + offsets;
+        return response;
     }
 
     public static void main(String[] args) {
@@ -48,6 +56,6 @@ public class searching {
         String text = args[0];
         String pattern = args[1];
 
-        search(text.toCharArray(), pattern.toCharArray());
+        System.out.println(search(text.toCharArray(), pattern.toCharArray()));
     }
 }

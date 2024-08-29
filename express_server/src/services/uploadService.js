@@ -3,7 +3,7 @@ const path = require('path');
 const ERROR = require('../constants/errors');
 const SUCCESS = require('../constants/responses');
 const uploadPdfData = require("../repository/uploadData");
-const { runJavaClass, runTest } = require("../utils/javaIntegration");
+//const { runJavaClass, runTest } = require("../utils/javaIntegration");
 const { textTransform } = require('../utils/textTransform');
 const { getChunkedData } = require('../utils/chunking');
 const { getExtractedText } = require('../utils/extractPdf');
@@ -28,12 +28,16 @@ const uploadService = async (req) => {
 
         const pages = getChunkedData(data);
 
+        data.forEach((page)=>{
+            fs.appendFileSync('./pdfData.txt', page.content, 'utf8');
+        })
+
         //fs.unlinkSync(filePath);
 
         //const encoded = await runJavaClass(send_your_arguments_here_as_json);
 
         const response = SUCCESS.getSuccessMessage("CREATED");
-    
+
         const responseData = {
             status: response.status,
             message: response.message,
@@ -41,12 +45,12 @@ const uploadService = async (req) => {
             content: pages,
         };
 
-        await uploadPdfData(JSON.stringify({pdfInfo, pages}));
+        await uploadPdfData(JSON.stringify({ pdfInfo, pages }));
 
         return responseData;
 
     } catch (err) {
-        console.error('Upload service error:', err); 
+        console.error('Upload service error:', err);
         const error = ERROR.getErrorMessage("INTERNAL_SERVER_ERROR");
         const errorData = {
             status: error.status,

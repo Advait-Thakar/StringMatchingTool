@@ -1,3 +1,5 @@
+const { subline } = require("../../prisma");
+
 const getChunkedData = (data) => {
     let pages = [];
 
@@ -22,15 +24,19 @@ const divideChunks = (content) => {
         if (line.length > chunkSize) {
             const sublines = divideLines(line, chunkSize);
             chunks.push({
-                linesId: linesId,
-                sublines
+                lines: [{
+                    lineId: linesId,
+                    sublines
+                }]
             });
         } else {
             chunks.push({
-                linesId: linesId,
-                sublines: [{
-                    sublineId: 1,
-                    subline: line
+                lines: [{
+                    lineId: linesId,
+                    sublines: [{
+                        sublineId: "1",
+                        text: line
+                    }]
                 }]
             });
         }
@@ -49,7 +55,7 @@ const divideLines = (lineContent, chunkSize) => {
         let subline = lineContent.substring(offset, end);
         sublines.push({
             sublineId: sublineId,
-            subline
+            text: subline
         });
     }
 

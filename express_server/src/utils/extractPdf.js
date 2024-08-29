@@ -1,4 +1,5 @@
 const pdf = require('pdf-parse');
+const { textTransform } = require('./textTransform');
 
 const getExtractedText = async (fileBuffer) => {
     // Create an array to store objects containing pageNumber and content
@@ -9,11 +10,12 @@ const getExtractedText = async (fileBuffer) => {
         pagerender: (pageData) => {
             return pageData.getTextContent().then((textContent) => {
                 const pageText = textContent.items.map(item => item.str).join(' ');
+                const tranformedText = textTransform(pageText);
 
                 // Store the extracted page text and page number into the array
                 pages.push({
                     pageNumber: pageData.pageNumber,
-                    content: pageText
+                    content: tranformedText
                 });
             });
         }

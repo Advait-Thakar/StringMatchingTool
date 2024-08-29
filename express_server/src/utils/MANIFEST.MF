@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: TechmintApp
+Main-Class: searching
 Created-By: 20.0.2 (Oracle Corporation)
 
